@@ -5,7 +5,7 @@
 ![INDATOKEN](./bannner-indatoken.png)
 
 
-# 🪙 INDATOKEN — IndaSOCIAL
+# 🪙 INDATOKEN — Indasocial
 
 > Token SPL nativo de la comunidad Indasocial, construido sobre Solana con Anchor Framework.
 > Incentiva la creación de contenido, premia a los mejores autores y habilita pagos dentro de la plataforma.
