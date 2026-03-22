@@ -79,7 +79,7 @@ Incluye:
 - Integración real con **Phantom Connect** (`window.solana`)
 - Soporte para Phantom Extension + Google + Apple (Phantom Connect SDK)
 - Vista **Write** — editor para publicar artículo on-chain
-- Vista **Dashboard** — perfil de Sarah con fases, earnings, artículos
+- Vista **Dashboard** — perfil de Sarah (creadora) con fases, earnings, artículos
 
 ---
 
