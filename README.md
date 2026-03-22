@@ -1,6 +1,3 @@
-<img style="display: block;-webkit-user-select: none;margin: auto;cursor: zoom-in;background-color: hsl(0, 0%, 90%);transition: background-color 300ms;" src="file:///Users/indasocial/Desktop/Captura%20de%20pantalla%202026-03-21%20a%20la(s)%208.07.48%E2%80%AFp.m..png" width="375" height="243">
-
-
 # 🪙 INDATOKEN — IndaSOCIAL
 
 > Token SPL nativo de la comunidad IndaSOCIAL, construido sobre Solana con Anchor Framework.
