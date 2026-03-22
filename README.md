@@ -7,7 +7,7 @@
 
 # 🪙 INDATOKEN — IndaSOCIAL
 
-> Token SPL nativo de la comunidad IndaSOCIAL, construido sobre Solana con Anchor Framework.
+> Token SPL nativo de la comunidad Indasocial, construido sobre Solana con Anchor Framework.
 > Incentiva la creación de contenido, premia a los mejores autores y habilita pagos dentro de la plataforma.
 
 ---
