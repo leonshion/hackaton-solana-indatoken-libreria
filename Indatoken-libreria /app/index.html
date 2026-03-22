@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>IndaSocial — Community Blog</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --brand:#1D9E75;--brand-dark:#0F6E56;--brand-bg:#1a2e24;--brand-mid:#5DCAA5;
+      --gold:#EF9F27;--gold-dark:#BA7517;--gold-bg:#2a2210;
+      --purple:#9945FF;--purple-dark:#7B2FBE;--purple-light:#c084fc;--red:#E24B4A;
+      --bg:#0f1117;--surface:#13151c;--surface2:#1a1d28;
+      --border:#1e2130;--border2:#2a2d3d;
+      --text:#e8e9ec;--text2:#8b8fa8;--text3:#6b6f84;--text4:#4b4f64;
+    }
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+    /* ── LAYOUT ── */
+    .app{display:flex;min-height:100vh;}
+    .main{flex:1;display:flex;flex-direction:column;min-width:0;}
+
+    /* ── SIDEBAR ── */
+    .sidebar{width:210px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;}
+    .sb-logo{display:flex;align-items:center;gap:9px;padding:20px 16px 16px;border-bottom:1px solid var(--border);}
+    .sb-icon{width:30px;height:30px;border-radius:8px;background:var(--brand);display:flex;align-items:center;justify-content:center;}
+    .sb-icon svg{width:17px;height:17px;}
+    .sb-name{font-size:16px;font-weight:700;color:#fff;}
+    .sb-nav{padding:14px 8px;flex:1;}
+    .sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:13px;color:var(--text2);cursor:pointer;margin-bottom:2px;text-decoration:none;transition:all .15s;}
+    .sb-item:hover{background:var(--surface2);color:var(--text);}
+    .sb-item.active{background:var(--brand-bg);color:var(--brand-mid);font-weight:600;}
+    .sb-item svg{width:15px;height:15px;flex-shrink:0;}
+
+    /* ── TOPBAR ── */
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;}
+    .topbar h1{font-size:18px;font-weight:700;color:#fff;}
+    .topbar p{font-size:12px;color:var(--text3);margin-top:1px;}
+    .topbar-right{display:flex;align-items:center;gap:10px;}
+    .write-btn{padding:8px 16px;background:var(--brand);border:none;border-radius:8px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;display:none;align-items:center;gap:6px;transition:background .15s;}
+    .write-btn:hover{background:var(--brand-dark);}
+    .connect-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface2);border:1px solid var(--purple);border-radius:9px;cursor:pointer;transition:all .2s;}
+    .connect-btn:hover{background:#1a0d2e;}
+    .ph-icon{width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));display:flex;align-items:center;justify-content:center;}
+    .ph-icon svg{width:13px;height:13px;}
+    .connect-label{font-size:13px;font-weight:600;color:var(--purple-light);}
+    .wallet-pill{display:none;align-items:center;gap:8px;padding:7px 13px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;cursor:pointer;}
+    .wallet-pill:hover{border-color:var(--brand);}
+    .w-dot{width:7px;height:7px;border-radius:50%;background:var(--brand);animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    .w-name{font-size:12px;font-weight:600;color:var(--text);}
+    .w-addr{font-size:10px;color:var(--text3);font-family:monospace;}
+    .w-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand-dark));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;}
+
+    /* ── VIEWS ── */
+    .view{display:none;flex:1;overflow-y:auto;padding:28px 32px;flex-direction:column;gap:22px;}
+    .view.active{display:flex;}
+
+    /* ── CONNECT BANNER ── */
+    .connect-banner{background:var(--surface);border:1px solid var(--purple);border-radius:14px;padding:22px 26px;display:flex;align-items:center;gap:18px;}
+    .cb-icon{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .cb-text h2{font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;}
+    .cb-text p{font-size:12px;color:var(--text2);line-height:1.6;}
+    .cb-actions{margin-left:auto;display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
+    .cb-main-btn{padding:9px 20px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));border:none;border-radius:9px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:7px;transition:opacity .2s;}
+    .cb-main-btn:hover{opacity:.88;}
+    .cb-sec-btn{font-size:11px;color:var(--text3);text-align:center;text-decoration:none;cursor:pointer;}
+    .cb-sec-btn:hover{color:var(--text);}
+
+    /* ── FEATURED ── */
+    .featured{display:grid;grid-template-columns:1fr 260px;gap:20px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;}
+    .feat-badges{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;}
+    .badge{padding:3px 10px;border-radius:999px;font-size:10px;font-weight:600;}
+    .badge-green{background:var(--brand-bg);color:var(--brand-mid);border:1px solid var(--brand);}
+    .badge-gold{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-dark);}
+    .feat-title{font-size:22px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:10px;}
+    .feat-desc{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:14px;}
+    .author-row{display:flex;align-items:center;gap:10px;}
+    .a-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand-dark));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+    .a-name{font-size:13px;font-weight:600;color:var(--text);}
+    .a-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+    .feat-img{border-radius:10px;background:linear-gradient(135deg,#0d2e22,#1a4d38);display:flex;align-items:center;justify-content:center;font-size:56px;position:relative;min-height:160px;}
+    .earn-tag{position:absolute;top:10px;right:10px;padding:4px 10px;background:var(--gold-bg);border:1px solid var(--gold-dark);border-radius:7px;font-size:11px;font-weight:700;color:var(--gold);}
+    .lock-section{padding-top:14px;border-top:1px solid var(--border);margin-top:14px;}
+    .price-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+    .price-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--gold-bg);border:1px solid var(--gold-dark);border-radius:7px;font-size:11px;color:var(--gold);font-weight:600;}
+    .split-note{font-size:11px;color:var(--text3);}
+    .lock-box{background:var(--surface2);border:1px dashed var(--border2);border-radius:10px;padding:16px;text-align:center;}
+    .lock-icon{width:34px;height:34px;border-radius:50%;background:var(--gold-bg);border:1px solid var(--gold-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;}
+    .lock-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;}
+    .lock-desc{font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.55;}
+    .unlock-btn{padding:9px 20px;border:none;border-radius:9px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:opacity .2s;}
+    .unlock-btn:hover{opacity:.88;}
+    .unlock-btn.needs{background:linear-gradient(135deg,var(--purple),var(--purple-dark));}
+    .unlock-btn.ready{background:linear-gradient(135deg,var(--brand),var(--brand-dark));}
+
+    /* ── FILTERS ── */
+    .filters{display:flex;gap:8px;flex-wrap:wrap;}
+    .filter-btn{padding:6px 14px;border-radius:999px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text2);transition:all .15s;}
+    .filter-btn:hover{border-color:var(--border2);color:var(--text);}
+    .filter-btn.active{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600;}
+
+    /* ── CARDS ── */
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .15s;}
+    .card:hover{border-color:var(--border2);}
+    .card-thumb{height:120px;display:flex;align-items:center;justify-content:center;font-size:30px;position:relative;}
+    .thumb-teal{background:linear-gradient(135deg,#0d2e22,#1a4d38);}
+    .thumb-pink{background:linear-gradient(135deg,#2e0d1a,#4d1a2e);}
+    .thumb-orange{background:linear-gradient(135deg,#2e1a0d,#4d2e0d);}
+    .thumb-blue{background:linear-gradient(135deg,#0d1a2e,#1a2e4d);}
+    .chip{position:absolute;top:7px;right:7px;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:600;}
+    .chip-green{background:rgba(29,158,117,.2);border:1px solid var(--brand);color:var(--brand-mid);}
+    .chip-lock{background:rgba(153,69,255,.15);border:1px solid var(--purple);color:var(--purple-light);}
+    .card-body{padding:12px;}
+    .cat{display:inline-block;padding:2px 7px;border-radius:999px;font-size:9px;font-weight:600;margin-bottom:5px;}
+    .cat-defi{background:#1a1a2e;color:#9B8FE8;}
+    .cat-web3{background:#2e1a2e;color:#D4A0D4;}
+    .cat-biz{background:var(--gold-bg);color:var(--gold);}
+    .cat-sol{background:var(--brand-bg);color:var(--brand-mid);}
+    .card-title{font-size:12px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:7px;}
+    .card-footer{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--text3);}
+    .lock-chip{padding:2px 7px;background:var(--gold-bg);border:1px solid var(--gold-dark);border-radius:5px;font-size:9px;font-weight:600;color:var(--gold);cursor:pointer;}
+
+    /* ── WRITE FORM ── */
+    .form-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px;}
+    .form-title{font-size:16px;font-weight:700;color:#fff;}
+    .form-sub{font-size:12px;color:var(--text3);}
+    .form-group{display:flex;flex-direction:column;gap:6px;}
+    .form-label{font-size:12px;font-weight:600;color:var(--text2);}
+    .form-input,.form-textarea,.form-select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 13px;font-size:13px;color:var(--text);font-family:inherit;outline:none;transition:border-color .15s;width:100%;}
+    .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--brand);}
+    .form-textarea{resize:vertical;min-height:90px;}
+    .form-select option{background:var(--surface2);}
+    .phase-notice{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:9px;font-size:12px;}
+    .phase-notice.fase1{background:#1a1d28;border:1px solid var(--border);color:var(--text3);}
+    .phase-notice.fase2{background:var(--brand-bg);border:1px solid var(--brand);color:var(--brand-mid);}
+    .phase-notice.fase3{background:var(--gold-bg);border:1px solid var(--gold-dark);color:var(--gold);}
+    .submit-btn{padding:11px 24px;background:var(--brand);border:none;border-radius:9px;font-size:14px;font-weight:700;color:#fff;cursor:pointer;align-self:flex-start;transition:background .15s;}
+    .submit-btn:hover{background:var(--brand-dark);}
+    .submit-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+    /* ── DASHBOARD ── */
+    .dash-hero{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;display:flex;align-items:center;gap:16px;}
+    .dash-av{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand-dark));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;position:relative;}
+    .top-badge{position:absolute;bottom:-4px;right:-4px;padding:2px 7px;background:var(--gold-bg);border:1px solid var(--gold-dark);border-radius:999px;font-size:9px;font-weight:600;color:var(--gold);}
+    .dash-info h2{font-size:18px;font-weight:700;color:#fff;}
+    .dash-info p{font-size:12px;color:var(--text3);margin-top:2px;}
+    .dash-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+    .dash-tag{padding:3px 10px;border-radius:999px;font-size:10px;font-weight:500;background:var(--surface2);color:var(--text2);border:1px solid var(--border2);}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+    .stat{background:var(--surface2);border-radius:10px;padding:13px 15px;}
+    .stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+    .stat-val{font-size:22px;font-weight:700;color:var(--text);line-height:1;}
+    .stat-val.green{color:var(--brand-mid);}
+    .stat-val.gold{color:var(--gold);}
+    .stat-sub{font-size:10px;color:var(--text3);margin-top:3px;}
+    .phases-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
+    .phases-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+    .phases-title{font-size:13px;font-weight:600;color:var(--text);}
+    .phase-active-badge{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-dark);}
+    .phases-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    .phase-box{border-radius:10px;padding:12px;border:1px solid var(--border);position:relative;}
+    .phase-box.done{background:var(--brand-bg);border-color:#9FE1CB;}
+    .phase-box.now{background:var(--gold-bg);border-color:var(--gold-dark);}
+    .phase-box.locked{background:var(--surface2);}
+    .phase-num{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+    .phase-box.done .phase-num{color:#085041;}
+    .phase-box.now .phase-num{color:var(--gold-dark);}
+    .phase-box.locked .phase-num{color:var(--text3);}
+    .phase-name{font-size:12px;font-weight:600;margin-bottom:2px;}
+    .phase-box.done .phase-name{color:var(--brand-mid);}
+    .phase-box.now .phase-name{color:var(--gold);}
+    .phase-box.locked .phase-name{color:var(--text2);}
+    .phase-desc{font-size:10px;line-height:1.5;}
+    .phase-box.done .phase-desc{color:#0F6E56;}
+    .phase-box.now .phase-desc{color:#854F0B;}
+    .phase-box.locked .phase-desc{color:var(--text3);}
+    .phase-check{position:absolute;top:8px;right:8px;width:16px;height:16px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;}
+    .phase-check svg{width:9px;height:9px;}
+    .earn-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
+    .earn-top{display:flex;align-items:baseline;gap:8px;padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:14px;}
+    .earn-big{font-size:34px;font-weight:700;color:var(--brand-mid);}
+    .earn-unit{font-size:13px;color:var(--text3);}
+    .earn-usd{font-size:11px;color:var(--text4);background:var(--surface2);padding:3px 8px;border-radius:6px;margin-left:4px;}
+    .earn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    .earn-box{background:var(--surface2);border-radius:10px;padding:13px;}
+    .earn-box-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+    .earn-box-val{font-size:18px;font-weight:700;margin-bottom:3px;}
+    .earn-box-val.green{color:var(--brand-mid);}
+    .earn-box-val.gold{color:var(--gold);}
+    .earn-box-val.blue{color:#378ADD;}
+    .earn-box-desc{font-size:10px;color:var(--text4);line-height:1.4;}
+    .earn-bar{margin-top:8px;height:3px;background:var(--border2);border-radius:2px;}
+    .earn-bar-fill{height:3px;border-radius:2px;}
+    .fill-green{background:var(--brand);}
+    .fill-gold{background:var(--gold);}
+    .fill-blue{background:#378ADD;}
+    .articles-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
+    .art-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+    .art-row:last-child{border-bottom:none;padding-bottom:0;}
+    .art-num{font-size:11px;color:var(--text3);min-width:22px;padding-top:2px;}
+    .art-body{flex:1;}
+    .art-title-text{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;line-height:1.4;}
+    .art-meta{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--text3);flex-wrap:wrap;}
+    .art-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+    .art-earn{font-size:12px;font-weight:600;color:var(--brand-mid);}
+    .art-eng{font-size:10px;color:var(--text3);}
+    .eng-bar{margin-top:3px;height:2px;background:var(--border);border-radius:1px;width:60px;}
+    .eng-fill{height:2px;border-radius:1px;background:var(--brand);}
+    .eng-fill.gold{background:var(--gold);}
+    .top-pill-sm{padding:2px 6px;border-radius:999px;font-size:9px;font-weight:600;background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-dark);}
+
+    /* ── MODAL ── */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px);}
+    .overlay.open{display:flex;}
+    .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:380px;max-width:94vw;}
+    .modal-hdr{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+    .modal-ph-logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .modal-ph-logo svg{width:22px;height:22px;}
+    .modal-title{font-size:15px;font-weight:700;color:#fff;}
+    .modal-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+    .modal-close{margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:3px 7px;border-radius:5px;}
+    .modal-close:hover{color:var(--text);}
+    .modal-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+    .modal-opt{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;}
+    .modal-opt:hover{border-color:var(--purple);background:#1a0d2e;}
+    .opt-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+    .opt-icon.ph{background:linear-gradient(135deg,var(--purple),var(--purple-dark));}
+    .opt-icon.gg{background:#fff;font-weight:700;color:#4285F4;font-size:14px;}
+    .opt-icon.ap{background:#000;border:1px solid var(--border2);color:#fff;}
+    .opt-label{font-size:13px;font-weight:600;color:var(--text);}
+    .opt-sub{font-size:10px;color:var(--text3);margin-top:1px;}
+    .modal-divider{text-align:center;font-size:10px;color:var(--text4);margin:2px 0 10px;}
+    .modal-note{font-size:11px;color:var(--text3);text-align:center;line-height:1.5;}
+    .modal-note a{color:var(--purple-light);text-decoration:none;}
+    .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite;margin:6px auto 12px;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .conn-msg{text-align:center;font-size:13px;color:var(--text2);}
+    .conn-addr{text-align:center;font-size:10px;color:var(--text3);font-family:monospace;margin-top:4px;}
+    .conn-hint{font-size:11px;color:var(--text3);text-align:center;margin-top:12px;line-height:1.5;}
+    .success-check{width:46px;height:46px;border-radius:50%;background:var(--brand-bg);border:2px solid var(--brand);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+    .success-check svg{width:22px;height:22px;}
+    .success-title{text-align:center;font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;}
+    .success-sub{text-align:center;font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5;}
+    .success-btn{width:100%;padding:10px;background:var(--brand);border:none;border-radius:9px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;}
+    .success-btn:hover{background:var(--brand-dark);}
+    .perms{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
+    .perm{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);}
+    .perm-chk{width:15px;height:15px;border-radius:50%;background:var(--brand-bg);border:1px solid var(--brand);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .perm-chk svg{width:8px;height:8px;}
+    .ph-connect-btn{width:100%;padding:11px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));border:none;border-radius:10px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s;}
+    .ph-connect-btn:hover{opacity:.9;}
+    .note-box{padding:10px 13px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--text3);line-height:1.5;border-left:2px solid var(--purple);}
+    .note-box.green{border-color:var(--brand);}
+    .section-header{display:flex;align-items:center;justify-content:space-between;}
+    .section-title{font-size:13px;font-weight:600;color:var(--text);}
+    .section-count{font-size:11px;color:var(--text3);}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-icon"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="#fff" stroke-width="1.5"/><polyline points="5,8 7,10.5 11,5.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="sb-name">IndaSocial</span>
+    </div>
+    <nav class="sb-nav">
+      <a class="sb-item" href="#"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>Dashboard</a>
+      <a class="sb-item" href="#"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Sales</a>
+      <a class="sb-item" href="#"><svg viewBox="0 0 16 16" fill="none"><path d="M14 8A6 6 0 1 1 2 8a6 6 0 0 1 12 0z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="7" r="2" stroke="currentColor" stroke-width="1.3"/></svg>Conecta con Marcas</a>
+      <a class="sb-item" href="#"><svg viewBox="0 0 16 16" fill="none"><circle cx="6" cy="6" r="3" stroke="currentColor" stroke-width="1.3"/><circle cx="11" cy="11" r="3" stroke="currentColor" stroke-width="1.3"/></svg>Community</a>
+      <a class="sb-item" href="#"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 3V2M11 3V2M2 7h12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Eventos</a>
+      <a class="sb-item active" id="nav-blog" onclick="showView('blog')" href="#"><svg viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h10M3 12h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Blog</a>
+      <a class="sb-item" id="nav-write" onclick="showView('write')" href="#" style="display:none;"><svg viewBox="0 0 16 16" fill="none"><path d="M12 2l2 2-9 9H3v-2L12 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Escribir</a>
+      <a class="sb-item" id="nav-dash" onclick="showView('dashboard')" href="#" style="display:none;"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 13c0-2.76 2.24-4 5-4s5 1.24 5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Mi Perfil</a>
+    </nav>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div><h1 id="pageTitle">Community Blog</h1><p id="pageSub">Stories and insights from our community</p></div>
+      <div class="topbar-right">
+        <button class="write-btn" id="writeBtnTop" onclick="showView('write')">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M12 2l2 2-9 9H3v-2L12 2z" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          Write Post
+        </button>
+        <div class="connect-btn" id="connectBtn" onclick="openModal()">
+          <div class="ph-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" stroke="#fff" stroke-width="1.8"/><path d="M14 5c0 2-1.5 3-3 3S8 7 8 5a3 3 0 0 1 6 0z" stroke="#fff" stroke-width="1.8"/></svg></div>
+          <span class="connect-label">Connect Wallet</span>
+        </div>
+        <div class="wallet-pill" id="walletPill" onclick="showView('dashboard')">
+          <div class="w-dot"></div>
+          <div><div class="w-name" id="wName">Sarah W.</div><div class="w-addr" id="wAddr">8xQr...k4Pz</div></div>
+          <div class="w-av" id="wAv">SW</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: BLOG -->
+    <div class="view active" id="view-blog">
+
+      <div class="connect-banner" id="connectBanner">
+        <div class="cb-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke="#fff" stroke-width="1.8"/><path d="M17 6c0 2.5-2 4.5-4 4.5S9 8.5 9 6a4 4 0 0 1 8 0z" stroke="#fff" stroke-width="1.8"/></svg></div>
+        <div class="cb-text">
+          <h2>Conecta tu wallet Phantom para empezar</h2>
+          <p>Accede a artículos premium, gana INDATOKEN escribiendo y participa en la comunidad Inda on-chain en Solana.</p>
+        </div>
+        <div class="cb-actions">
+          <button class="cb-main-btn" onclick="openModal()">
+            <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" stroke="#fff" stroke-width="2"/></svg>
+            Conectar con Phantom
+          </button>
+          <a class="cb-sec-btn" href="https://phantom.app/download" target="_blank">¿Sin Phantom? Descárgalo gratis →</a>
+        </div>
+      </div>
+
+      <div class="featured">
+        <div>
+          <div class="feat-badges">
+            <span class="badge badge-green">Featured Story</span>
+            <span class="badge badge-gold">Top Author</span>
+          </div>
+          <div class="feat-title">Cómo Solana resuelve el trilema blockchain en 2026</div>
+          <div class="feat-desc">Sarah explica por qué Solana lidera en velocidad, seguridad y descentralización — y cómo INDATOKEN aprovecha esta infraestructura para la comunidad Inda.</div>
+          <div class="author-row">
+            <div class="a-av">SW</div>
+            <div><div class="a-name">Sarah Williams</div><div class="a-sub">Autor Top · 23 artículos · 38 INDATOKEN ganados</div></div>
+          </div>
+          <div class="lock-section">
+            <div class="price-row">
+              <div class="price-tag"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="2.5" y="5" width="7" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 5V3.5a2 2 0 0 1 4 0V5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>1 INDATOKEN para leer</div>
+              <span class="split-note">→ 80% Sarah · 20% IndaSOCIAL</span>
+            </div>
+            <div class="lock-box">
+              <div class="lock-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="3.5" y="7" width="9" height="7" rx="1.5" stroke="#EF9F27" stroke-width="1.3"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="#EF9F27" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+              <div class="lock-title" id="lockTitle">Artículo premium — Autor Top</div>
+              <div class="lock-desc" id="lockDesc">Conecta tu wallet Phantom para desbloquear. 80% va directo a Sarah.</div>
+              <button class="unlock-btn needs" id="unlockBtn" onclick="handleUnlock()">
+                <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" stroke="#fff" stroke-width="2"/></svg>
+                Conecta Phantom para leer
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="feat-img">🌿<div class="earn-tag">+1 INDATOKEN</div></div>
+      </div>
+
+      <div class="filters">
+        <button class="filter-btn active">All Stories (23)</button>
+        <button class="filter-btn">Solana (8)</button>
+        <button class="filter-btn">DeFi (7)</button>
+        <button class="filter-btn">Web3 (5)</button>
+        <button class="filter-btn">Business (3)</button>
+      </div>
+
+      <div class="cards">
+        <div class="card"><div class="card-thumb thumb-teal">🪙<div class="chip chip-green">+1 INDA</div></div><div class="card-body"><span class="cat cat-defi">DeFi</span><div class="card-title">INDATOKEN: economía de creadores on-chain</div><div class="card-footer"><span>980 views · 88%</span></div></div></div>
+        <div class="card"><div class="card-thumb thumb-pink">🔐<div class="chip chip-lock">1 INDA</div></div><div class="card-body"><span class="cat cat-web3">Web3</span><div class="card-title">Wallets en Solana: guía completa para la comunidad Inda</div><div class="card-footer"><span>740 views</span><span class="lock-chip" onclick="handleUnlock()">Unlock</span></div></div></div>
+        <div class="card"><div class="card-thumb thumb-orange">📈<div class="chip chip-green">+1 INDA</div></div><div class="card-body"><span class="cat cat-biz">Business</span><div class="card-title">De 0 a Autor Top: mi camino en IndaSOCIAL</div><div class="card-footer"><span>610 views · 65%</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- VIEW: WRITE -->
+    <div class="view" id="view-write">
+      <div class="form-card">
+        <div><div class="form-title">Publicar artículo</div><div class="form-sub" style="margin-top:4px;">Tu artículo se guarda on-chain en Solana vía INDATOKEN</div></div>
+        <div class="phase-notice fase2" id="phaseNotice">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3l1.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <span id="phaseText">Fase 2 — Autor Establecido · Recibirás +1 INDATOKEN al publicar</span>
+        </div>
+        <div class="form-group"><label class="form-label">Título del artículo *</label><input class="form-input" id="fTitulo" placeholder="Ej: Cómo usar Phantom en IndaSOCIAL" maxlength="120"/></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="form-group"><label class="form-label">Categoría</label>
+            <select class="form-select" id="fCategoria">
+              <option value="Solana">Solana</option>
+              <option value="DeFi">DeFi</option>
+              <option value="Web3">Web3</option>
+              <option value="IA">IA</option>
+              <option value="Business">Business</option>
+              <option value="Community">Community</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">URL del artículo completo</label><input class="form-input" id="fUrl" placeholder="https://..."/></div>
+        </div>
+        <div class="form-group"><label class="form-label">Resumen (máx 280 caracteres)</label><textarea class="form-textarea" id="fResumen" placeholder="Describe de qué trata tu artículo..." maxlength="280"></textarea></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div style="font-size:12px;color:var(--text3);">Esta instrucción llama a <code style="color:var(--brand-mid);background:var(--surface2);padding:1px 5px;border-radius:4px;">publicar_articulo</code> en Solana Devnet</div>
+          <button class="submit-btn" id="publishBtn" onclick="publishArticle()">Publicar on-chain →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: DASHBOARD -->
+    <div class="view" id="view-dashboard">
+
+      <div class="dash-hero">
+        <div class="dash-av" id="dashAv">SW<div class="top-badge">Top</div></div>
+        <div class="dash-info">
+          <h2 id="dashName">Sarah Williams</h2>
+          <p id="dashAddr">8xQr...k4Pz · Phantom Wallet · Solana Devnet</p>
+          <div class="dash-tags">
+            <span class="dash-tag">Solana</span>
+            <span class="dash-tag">DeFi</span>
+            <span class="dash-tag">Web3</span>
+          </div>
+        </div>
+        <button onclick="disconnectWallet()" style="margin-left:auto;padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);font-size:12px;color:var(--text3);cursor:pointer;">Desconectar</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-label">Artículos</div><div class="stat-val">23</div><div class="stat-sub">8 este mes</div></div>
+        <div class="stat"><div class="stat-label">Lecturas</div><div class="stat-val">4.2k</div><div class="stat-sub">+18% semanal</div></div>
+        <div class="stat"><div class="stat-label">Engagement</div><div class="stat-val green">94%</div><div class="stat-sub">#1 en plataforma</div></div>
+        <div class="stat"><div class="stat-label">Balance</div><div class="stat-val gold">38</div><div class="stat-sub">INDATOKEN</div></div>
+      </div>
+
+      <div class="phases-card">
+        <div class="phases-header">
+          <div class="phases-title">Progreso de autor</div>
+          <div class="phase-active-badge">Fase 3 — Autor Top</div>
+        </div>
+        <div class="phases-grid">
+          <div class="phase-box done"><div class="phase-check"><svg viewBox="0 0 10 10" fill="none"><polyline points="2,5 4,7.5 8,2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="phase-num">Fase 1</div><div class="phase-name">Nueva autora</div><div class="phase-desc">1–14 artículos · Publicación gratis · Sin recompensa</div></div>
+          <div class="phase-box done"><div class="phase-check"><svg viewBox="0 0 10 10" fill="none"><polyline points="2,5 4,7.5 8,2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="phase-num">Fase 2</div><div class="phase-name">Establecida</div><div class="phase-desc">15+ artículos · +1 INDATOKEN por artículo publicado</div></div>
+          <div class="phase-box now"><div class="phase-num">Fase 3</div><div class="phase-name">Autora Top ⭐</div><div class="phase-desc">Mejor engagement · +5 INDA bonus · Artículos premium</div></div>
+        </div>
+      </div>
+
+      <div class="earn-card">
+        <div class="section-header" style="margin-bottom:14px;"><div class="section-title">Earnings</div><div class="section-count">Historial acumulado</div></div>
+        <div class="earn-top"><div class="earn-big">38</div><div class="earn-unit">INDATOKEN</div><div class="earn-usd">≈ 12.40 USD</div></div>
+        <div class="earn-grid">
+          <div class="earn-box"><div class="earn-box-label">Por publicar</div><div class="earn-box-val green">+8 INDA</div><div class="earn-box-desc">8 artículos × 1 INDA (Fase 2+)</div><div class="earn-bar"><div class="earn-bar-fill fill-green" style="width:21%"></div></div></div>
+          <div class="earn-box"><div class="earn-box-label">Bonus engagement</div><div class="earn-box-val gold">+25 INDA</div><div class="earn-box-desc">5 reconocimientos × 5 INDA Top</div><div class="earn-bar"><div class="earn-bar-fill fill-gold" style="width:66%"></div></div></div>
+          <div class="earn-box"><div class="earn-box-label">Lecturas premium</div><div class="earn-box-val blue">+5 INDA</div><div class="earn-box-desc">Split 80/20 por lectores</div><div class="earn-bar"><div class="earn-bar-fill fill-blue" style="width:13%"></div></div></div>
+        </div>
+      </div>
+
+      <div class="articles-card">
+        <div class="section-header" style="margin-bottom:14px;"><div class="section-title">Artículos publicados</div><div class="section-count">23 en total</div></div>
+        <div class="art-row"><div class="art-num">#23</div><div class="art-body"><div class="art-title-text">Cómo Solana resuelve el trilema blockchain en 2026</div><div class="art-meta"><span class="cat cat-sol" style="font-size:9px;">Solana</span><span>hace 2 días</span><span>·</span><span>1.2k lecturas</span></div><div class="eng-bar" style="margin-top:5px;"><div class="eng-fill gold" style="width:95%"></div></div></div><div class="art-right"><div class="top-pill-sm">Top</div><div class="art-earn">+1 INDA</div><div class="art-eng">95% eng.</div></div></div>
+        <div class="art-row"><div class="art-num">#22</div><div class="art-body"><div class="art-title-text">INDATOKEN: economía de creadores on-chain</div><div class="art-meta"><span class="cat cat-defi" style="font-size:9px;">DeFi</span><span>hace 5 días</span><span>·</span><span>980 lecturas</span></div><div class="eng-bar" style="margin-top:5px;"><div class="eng-fill gold" style="width:88%"></div></div></div><div class="art-right"><div class="top-pill-sm">Top</div><div class="art-earn">+1 INDA</div><div class="art-eng">88% eng.</div></div></div>
+        <div class="art-row"><div class="art-num">#21</div><div class="art-body"><div class="art-title-text">Wallets en Solana: guía completa para la comunidad Inda</div><div class="art-meta"><span class="cat cat-web3" style="font-size:9px;">Web3</span><span>hace 1 semana</span><span>·</span><span>740 lecturas</span></div><div class="eng-bar" style="margin-top:5px;"><div class="eng-fill" style="width:72%"></div></div></div><div class="art-right"><div class="art-earn">+1 INDA</div><div class="art-eng">72% eng.</div></div></div>
+        <div class="art-row"><div class="art-num">#20</div><div class="art-body"><div class="art-title-text">DeFi para principiantes: qué necesitas saber hoy</div><div class="art-meta"><span class="cat cat-defi" style="font-size:9px;">DeFi</span><span>hace 2 semanas</span><span>·</span><span>610 lecturas</span></div><div class="eng-bar" style="margin-top:5px;"><div class="eng-fill" style="width:65%"></div></div></div><div class="art-right"><div class="art-earn">+1 INDA</div><div class="art-eng">65% eng.</div></div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PHANTOM CONNECT MODAL -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+
+    <div id="stepOptions">
+      <div class="modal-hdr">
+        <div class="modal-ph-logo"><svg viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke="#fff" stroke-width="1.8"/><path d="M17 6c0 2.5-2 4.5-4 4.5S9 8.5 9 6a4 4 0 0 1 8 0z" stroke="#fff" stroke-width="1.8"/></svg></div>
+        <div><div class="modal-title">Conectar con Phantom</div><div class="modal-sub">Elige tu método de acceso</div></div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="perms">
+        <div class="perm"><div class="perm-chk"><svg viewBox="0 0 10 10" fill="none"><polyline points="2,5 4,7.5 8,2.5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Ver tu dirección pública de Solana</div>
+        <div class="perm"><div class="perm-chk"><svg viewBox="0 0 10 10" fill="none"><polyline points="2,5 4,7.5 8,2.5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Firmar transacciones INDATOKEN</div>
+        <div class="perm"><div class="perm-chk"><svg viewBox="0 0 10 10" fill="none"><polyline points="2,5 4,7.5 8,2.5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Recibir recompensas on-chain</div>
+      </div>
+      <div class="modal-opts">
+        <div class="modal-opt" onclick="connectPhantom('extension')">
+          <div class="opt-icon ph"><svg viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" stroke="#fff" stroke-width="1.8"/><path d="M14 5c0 2-1.5 3-3 3S8 7 8 5a3 3 0 0 1 6 0z" stroke="#fff" stroke-width="1.8"/></svg></div>
+          <div><div class="opt-label">Phantom Extension</div><div class="opt-sub">Conecta tu wallet existente en el navegador</div></div>
+          <svg style="margin-left:auto;color:var(--text3)" width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="modal-divider">— o usa Phantom Connect (sin extensión) —</div>
+        <div class="modal-opt" onclick="connectPhantom('google')">
+          <div class="opt-icon gg">G</div>
+          <div><div class="opt-label">Continuar con Google</div><div class="opt-sub">Phantom crea una embedded wallet automáticamente</div></div>
+          <svg style="margin-left:auto;color:var(--text3)" width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="modal-opt" onclick="connectPhantom('apple')">
+          <div class="opt-icon ap" style="font-size:18px;">&#63743;</div>
+          <div><div class="opt-label">Continuar con Apple</div><div class="opt-sub">Phantom crea una embedded wallet automáticamente</div></div>
+          <svg style="margin-left:auto;color:var(--text3)" width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="modal-note">Al conectar, aceptas los <a href="#">Términos de IndaSOCIAL</a>.<br/>Tus llaves privadas nunca salen de Phantom.</div>
+    </div>
+
+    <div id="stepConnecting" style="display:none;text-align:center;padding:8px 0;">
+      <div class="spinner"></div>
+      <div class="conn-msg" id="connMsg">Abriendo Phantom...</div>
+      <div class="conn-addr" id="connAddr"></div>
+      <div class="conn-hint">Aprueba la conexión en Phantom para continuar</div>
+    </div>
+
+    <div id="stepSuccess" style="display:none;">
+      <div class="success-check"><svg viewBox="0 0 24 24" fill="none" width="22" height="22"><polyline points="4,12 9,17 20,6" stroke="#1D9E75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="success-title">¡Wallet conectada!</div>
+      <div class="success-sub" id="successMsg">Sarah W. · 8xQr...k4Pz<br/>38 INDATOKEN · 2.45 SOL · Solana Devnet</div>
+      <button class="success-btn" onclick="finalizeConnect()">Continuar a IndaSOCIAL →</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// PHANTOM CONNECT — Integración oficial
+// Docs: https://docs.phantom.com/phantom-connect
+// SDK:  @phantom/wallet-sdk (para producción)
+// ═══════════════════════════════════════════════════════════════
+
+let connected = false;
+let publicKey = null;
+
+// Detectar Phantom instalado (window.solana injected provider)
+const isPhantomInstalled = () => window?.solana?.isPhantom === true;
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('overlay').classList.add('open');
+  showStep('Options');
+}
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  setTimeout(() => showStep('Options'), 300);
+}
+function showStep(s) {
+  ['stepOptions','stepConnecting','stepSuccess'].forEach(id => {
+    document.getElementById(id).style.display = (id === 'step'+s) ? 'block' : 'none';
+  });
+}
+
+// ── CONNECT ───────────────────────────────────────────────────
+async function connectPhantom(method) {
+  showStep('Connecting');
+  const msgs = {
+    extension: 'Abriendo Phantom extension...',
+    google:    'Iniciando sesión con Google...',
+    apple:     'Iniciando sesión con Apple...'
+  };
+  document.getElementById('connMsg').textContent = msgs[method];
+
+  try {
+    if (method === 'extension') {
+      if (!isPhantomInstalled()) {
+        // Phantom no instalado → redirigir a descarga oficial
+        document.getElementById('connMsg').textContent = 'Phantom no detectado. Abriendo descarga...';
+        setTimeout(() => {
+          window.open('https://phantom.app/download', '_blank');
+          closeModal();
+        }, 1500);
+        return;
+      }
+      // Conectar con Phantom injected provider (window.solana)
+      // Referencia: https://docs.phantom.com/solana/integrating-phantom
+      const resp = await window.solana.connect();
+      publicKey = resp.publicKey.toString();
+
+    } else {
+      // Phantom Connect SDK (social login — Google / Apple)
+      // En producción usar: import { createPhantom } from '@phantom/wallet-sdk'
+      // const phantom = await createPhantom({ appId: 'TU_APP_ID_DE_PHANTOM_PORTAL' });
+      // const session = await phantom.connect({ socialProvider: method });
+      // publicKey = session.address;
+      //
+      // Para la maqueta simulamos el delay de autenticación:
+      await new Promise(r => setTimeout(r, 1800));
+      publicKey = '8xQr4mN2pLk7vBtJsRwDhYcXeAf9uZgk4Pz';
+    }
+
+    // Persistir sesión en localStorage
+    localStorage.setItem('inda_wallet', publicKey);
+    localStorage.setItem('inda_method', method);
+
+    // Mostrar éxito
+    const short = publicKey.slice(0,4) + '...' + publicKey.slice(-4);
+    document.getElementById('successMsg').textContent =
+      `${short}\n38 INDATOKEN · 2.45 SOL · Solana Devnet`;
+    showStep('Success');
+
+  } catch (err) {
+    console.error('[IndaSOCIAL] Phantom connect error:', err);
+    document.getElementById('connMsg').textContent = 'Error al conectar. Inténtalo de nuevo.';
+    setTimeout(() => showStep('Options'), 2000);
+  }
+}
+
+function finalizeConnect() {
+  connected = true;
+  closeModal();
+  updateUI();
+}
+
+// ── UI POST-CONNECT ────────────────────────────────────────────
+function updateUI() {
+  const short = publicKey
+    ? publicKey.slice(0,4) + '...' + publicKey.slice(-4)
+    : '8xQr...k4Pz';
+
+  // Topbar
+  document.getElementById('connectBtn').style.display  = 'none';
+  document.getElementById('walletPill').style.display  = 'flex';
+  document.getElementById('writeBtnTop').style.display = 'flex';
+
+  // Banner
+  document.getElementById('connectBanner').style.display = 'none';
+
+  // Sidebar items
+  document.getElementById('nav-write').style.display = 'flex';
+  document.getElementById('nav-dash').style.display  = 'flex';
+
+  // Lock box
+  document.getElementById('lockTitle').textContent = '¡Wallet conectada! Listo para leer';
+  document.getElementById('lockDesc').textContent  =
+    '1 INDATOKEN se descontará de tu wallet. 0.8 INDA → Sarah · 0.2 INDA → treasury.';
+  const ub = document.getElementById('unlockBtn');
+  ub.className = 'unlock-btn ready';
+  ub.innerHTML = '🔓 Desbloquear por 1 INDATOKEN';
+}
+
+// ── UNLOCK ARTICLE ─────────────────────────────────────────────
+function handleUnlock() {
+  if (!connected) { openModal(); return; }
+  if (confirm('Confirmar pago de 1 INDATOKEN\n\n0.8 INDA → Sarah Williams\n0.2 INDA → Treasury IndaSOCIAL\n\nEsta tx se enviará a Solana Devnet.')) {
+    alert('✅ Transacción enviada a Solana Devnet\nPrograma: indatoken · instrucción: leer_articulo_top\nArticulo desbloqueado correctamente.');
+  }
+}
+
+// ── PUBLISH ARTICLE ────────────────────────────────────────────
+function publishArticle() {
+  if (!connected) { openModal(); return; }
+  const titulo = document.getElementById('fTitulo').value.trim();
+  if (!titulo) { alert('Por favor escribe un título.'); return; }
+  const categoria = document.getElementById('fCategoria').value;
+  const resumen   = document.getElementById('fResumen').value.trim();
+  const url       = document.getElementById('fUrl').value.trim();
+
+  // En producción: llamar a publicar_articulo via @coral-xyz/anchor
+  // const tx = await program.methods
+  //   .publicarArticulo(titulo, categoria, resumen, url)
+  //   .accounts({ articulo, autorCuenta, plataforma, treasury, ... })
+  //   .rpc();
+
+  alert(`✅ Artículo "${titulo}" publicado on-chain\nPrograma: indatoken\nInstrucción: publicar_articulo\nCategoria: ${categoria}\nRed: Solana Devnet`);
+  document.getElementById('fTitulo').value  = '';
+  document.getElementById('fResumen').value = '';
+  document.getElementById('fUrl').value     = '';
+  showView('blog');
+}
+
+// ── DISCONNECT ─────────────────────────────────────────────────
+function disconnectWallet() {
+  if (window?.solana?.disconnect) window.solana.disconnect();
+  connected = false; publicKey = null;
+  localStorage.removeItem('inda_wallet');
+  localStorage.removeItem('inda_method');
+  document.getElementById('connectBtn').style.display  = 'flex';
+  document.getElementById('walletPill').style.display  = 'none';
+  document.getElementById('writeBtnTop').style.display = 'none';
+  document.getElementById('connectBanner').style.display = 'flex';
+  document.getElementById('nav-write').style.display = 'none';
+  document.getElementById('nav-dash').style.display  = 'none';
+  document.getElementById('lockTitle').textContent = 'Artículo premium — Autor Top';
+  document.getElementById('lockDesc').textContent  = 'Conecta tu wallet Phantom para desbloquear este artículo por 1 INDATOKEN.';
+  const ub = document.getElementById('unlockBtn');
+  ub.className = 'unlock-btn needs';
+  ub.innerHTML = '<svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" stroke="#fff" stroke-width="2"/></svg> Conecta Phantom para leer';
+  showView('blog');
+}
+
+// ── NAVIGATION ─────────────────────────────────────────────────
+function showView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(el => el.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + v);
+  if (navEl) navEl.classList.add('active');
+  const titles = {
+    blog:      ['Community Blog',   'Stories and insights from our community'],
+    write:     ['Publicar artículo','Tu artículo va on-chain en Solana'],
+    dashboard: ['Mi Perfil',        'Dashboard de Sarah Williams · INDATOKEN']
+  };
+  document.getElementById('pageTitle').textContent = titles[v][0];
+  document.getElementById('pageSub').textContent   = titles[v][1];
+}
+
+// ── INIT ────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  // Restaurar sesión si existe
+  const saved = localStorage.getItem('inda_wallet');
+  if (saved) { publicKey = saved; connected = true; updateUI(); }
+
+  // Escuchar cambios de cuenta Phantom
+  if (window.solana) {
+    window.solana.on('accountChanged', pk => {
+      if (pk) { publicKey = pk.toString(); updateUI(); }
+      else disconnectWallet();
+    });
+  }
+
+  // Filtros del blog
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+});
+</script>
+</body>
+</html>
